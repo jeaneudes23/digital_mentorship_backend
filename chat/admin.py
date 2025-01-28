@@ -5,3 +5,4 @@ from . import models
 admin.site.register(models.Profile)
 admin.site.register(models.ChatRoom)
 admin.site.register(models.Message)
+admin.site.register(models.ChatRoomUser)

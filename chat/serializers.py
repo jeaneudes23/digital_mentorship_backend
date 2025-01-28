@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, ChatRoom , ChatRoomUser , Message
+
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -20,3 +21,22 @@ class UserSerializer(serializers.ModelSerializer):
   def create(self, validated_data):
     user = User.objects.create_user(**validated_data)
     return user 
+  
+class ChatRoomUserSerializer(serializers.ModelSerializer):
+  user = UserSerializer
+  class Meta:
+    model= ChatRoomUser
+    fields= ['id','user','is_admin']
+
+class MessageSerializer(serializers.ModelSerializer):
+  sender = UserSerializer()
+  class Meta:
+    model = Message
+    fields = ['id','content','sender','sent_at','chatRoom']
+class ChatRoomSerializer(serializers.ModelSerializer):
+  users = UserSerializer(many=True)
+  admin= UserSerializer()
+  lastMessage = MessageSerializer()
+  class Meta:
+    model = ChatRoom
+    fields = ['id','is_private','users','admin','lastMessage','updated_at']

@@ -20,13 +20,24 @@ class Profile(models.Model):
   document = models.CharField(max_length=255,null=True,blank=True)
   
 class ChatRoom(models.Model):
-  user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="chats_started")
+  users = models.ManyToManyField(
+    User,
+    through="ChatRoomUser",
+    related_name="chat_rooms"
+  )
+  admin = models.ForeignKey(User,on_delete=models.CASCADE)
+  lastMessage = models.ForeignKey('Message',on_delete=models.CASCADE,null=True,blank=True)
+  
+  is_private = models.BooleanField(default=False)
   updated_at = models.DateTimeField(auto_now=True)
   
-class ChatRoomUser():
-  user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="chats_started")
-  chatRoom = models.ForeignKey(ChatRoom,on_delete=models.CASCADE,related_name="chat_messages")
-
+  def __str__(self):
+    return f"{self.users.only('username')}"
+  
+class ChatRoomUser(models.Model):
+  user = models.ForeignKey(User,on_delete=models.CASCADE)
+  chatRoom = models.ForeignKey(ChatRoom,on_delete=models.CASCADE)
+  joined_at = models.DateTimeField(auto_now_add=True)
   
 class Message(models.Model):
   sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name="sent_messages")
